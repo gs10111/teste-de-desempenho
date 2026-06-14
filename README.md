@@ -21,7 +21,7 @@ e **Pico**.
 ├── results/                # Evidências: <teste>.txt, <teste>-summary.json, stress-breakpoint.txt
 ├── report/
 │   ├── relatorio-tecnico.html
-│   └── relatorio-tecnico.pdf  # Relatório técnico (1 página, modelo ABNT)
+│   └── relatorio-tecnico.pdf  # Relatório técnico (modelo ABNT + apêndice com prints do k6)
 └── tools/
     ├── analyze-stress.js   # Agrega o JSON do stress e localiza o breaking point
     └── extract-metrics.js  # Consolida os *-summary.json para o relatório

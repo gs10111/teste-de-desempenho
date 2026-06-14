@@ -98,5 +98,143 @@
   <p style="margin-top:.3em">Em síntese, o ponto de ruptura situa-se em <b>~74 VUs</b> (primeiros
   <i>timeouts</i>), com <b>colapso total (≈100% de falhas) em ~386 VUs</b>.</p>
 
+<!--APENDICE-INI-->
+  <div style="page-break-before:always;"></div>
+  <h2 class="sec">Apêndice A – Resumos de Execução do k6 (prints)</h2>
+  <p>Reproduções das saídas de resumo geradas pelo k6 (via <i>handleSummary</i>) ao final de cada teste, evidenciando as métricas reais coletadas.</p>
+
+  <div style="page-break-inside:avoid;">
+    <div style="font-size:10pt;text-align:center;margin:10pt 0 1pt;">Quadro 1 – Resumo de execução do k6 — Smoke Test — GET /health</div>
+    <pre style="font-family:Consolas,monospace;font-size:6.5pt;line-height:1.12;white-space:pre-wrap;word-break:break-word;border:0.75pt solid #999;background:#f5f5f5;padding:4pt 6pt;margin:2pt 0 1pt;">     execution: local
+        script: tests\smoke.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 1 max VUs, 1m0s max duration (incl. graceful stop):
+              * default: 1 looping VUs for 30s (gracefulStop: 30s)
+
+     ✓ status é 200
+     ✓ corpo status=UP
+
+   ✓ checks.........................: 100.00% ✓ 60       ✗ 0
+     data_received..................: 8.7 kB  284 B/s
+     data_sent......................: 2.3 kB  75 B/s
+     http_req_blocked...............: avg=166.63µs min=0s med=0s     max=3.99ms  p(90)=0s     p(95)=549.94µs p(99)=3.12ms
+     http_req_connecting............: avg=99.99µs  min=0s med=0s     max=2.99ms  p(90)=0s     p(95)=0s       p(99)=2.12ms
+     http_req_duration..............: avg=5.89ms   min=0s med=1.99ms max=81.68ms p(90)=7.89ms p(95)=14.98ms  p(99)=63.17ms
+       { expected_response:true }...: avg=5.89ms   min=0s med=1.99ms max=81.68ms p(90)=7.89ms p(95)=14.98ms  p(99)=63.17ms
+   ✓ http_req_failed................: 0.00%   ✓ 0        ✗ 30
+     http_req_receiving.............: avg=66.82µs  min=0s med=0s     max=1.99ms  p(90)=0s     p(95)=3.68µs   p(99)=1.42ms
+     http_req_sending...............: avg=33.35µs  min=0s med=0s     max=1ms     p(90)=0s     p(95)=0s       p(99)=710.49µs
+     http_req_tls_handshaking.......: avg=0s       min=0s med=0s     max=0s      p(90)=0s     p(95)=0s       p(99)=0s
+     http_req_waiting...............: avg=5.79ms   min=0s med=1.81ms max=81.68ms p(90)=7.89ms p(95)=14.98ms  p(99)=63.17ms
+     http_reqs......................: 30      0.981693/s
+     iteration_duration.............: avg=1.01s    min=1s med=1s     max=1.1s    p(90)=1.03s  p(95)=1.07s    p(99)=1.09s
+     iterations.....................: 30      0.981693/s
+     vus............................: 1       min=1      max=1
+     vus_max........................: 1       min=1      max=1</pre>
+    <div style="font-size:9pt;text-align:left;margin:0 0 6pt;">Fonte: Elaborado pelo autor (2026).</div>
+  </div>
+
+  <div style="page-break-inside:avoid;">
+    <div style="font-size:10pt;text-align:center;margin:10pt 0 1pt;">Quadro 2 – Resumo de execução do k6 — Teste de Carga — POST /checkout/simple</div>
+    <pre style="font-family:Consolas,monospace;font-size:6.5pt;line-height:1.12;white-space:pre-wrap;word-break:break-word;border:0.75pt solid #999;background:#f5f5f5;padding:4pt 6pt;margin:2pt 0 1pt;">     execution: local
+        script: tests\load.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 50 max VUs, 4m0s max duration (incl. graceful stop):
+              * default: Up to 50 looping VUs for 3m30s over 3 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+     ✓ status é 201
+     ✓ status=APPROVED
+
+     checks.........................: 100.00% ✓ 74554      ✗ 0
+     data_received..................: 11 MB   53 kB/s
+     data_sent......................: 7.2 MB  34 kB/s
+     http_req_blocked...............: avg=11.78µs  min=0s      med=0s       max=23.1ms  p(90)=0s       p(95)=0s       p(99)=0s
+     http_req_connecting............: avg=4.87µs   min=0s      med=0s       max=23.01ms p(90)=0s       p(95)=0s       p(99)=0s
+   ✓ http_req_duration..............: avg=219.21ms min=99.48ms med=215.18ms max=4.03s   p(90)=296.22ms p(95)=308.52ms p(99)=370.41ms
+       { expected_response:true }...: avg=219.21ms min=99.48ms med=215.18ms max=4.03s   p(90)=296.22ms p(95)=308.52ms p(99)=370.41ms
+   ✓ http_req_failed................: 0.00%   ✓ 0          ✗ 37277
+     http_req_receiving.............: avg=3.8ms    min=0s      med=0s       max=3.51s   p(90)=0s       p(95)=999.4µs  p(99)=3.99ms
+     http_req_sending...............: avg=158.17µs min=0s      med=0s       max=3.52s   p(90)=0s       p(95)=0s       p(99)=999.6µs
+     http_req_tls_handshaking.......: avg=0s       min=0s      med=0s       max=0s      p(90)=0s       p(95)=0s       p(99)=0s
+     http_req_waiting...............: avg=215.25ms min=99.48ms med=214.97ms max=1.16s   p(90)=295.61ms p(95)=307.47ms p(99)=352.54ms
+     http_reqs......................: 37277   177.342456/s
+     iteration_duration.............: avg=221.74ms min=99.48ms med=215.63ms max=4.06s   p(90)=296.86ms p(95)=309.72ms p(99)=384.77ms
+     iterations.....................: 37277   177.342456/s
+     vus............................: 2       min=1        max=50
+     vus_max........................: 50      min=50       max=50</pre>
+    <div style="font-size:9pt;text-align:left;margin:0 0 6pt;">Fonte: Elaborado pelo autor (2026).</div>
+  </div>
+
+  <div style="page-break-inside:avoid;">
+    <div style="font-size:10pt;text-align:center;margin:10pt 0 1pt;">Quadro 3 – Resumo de execução do k6 — Teste de Estresse — POST /checkout/crypto</div>
+    <pre style="font-family:Consolas,monospace;font-size:6.5pt;line-height:1.12;white-space:pre-wrap;word-break:break-word;border:0.75pt solid #999;background:#f5f5f5;padding:4pt 6pt;margin:2pt 0 1pt;">     execution: local
+        script: tests\stress.js
+        output: json (results/stress-raw.json)
+
+     scenarios: (100.00%) 1 scenario, 1000 max VUs, 6m30s max duration (incl. graceful stop):
+              * default: Up to 1000 looping VUs for 6m0s over 3 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+     ✗ status é 201
+      ↳  18% — ✓ 1104 / ✗ 4914
+     ✗ status=SECURE_TRANSACTION
+      ↳  18% — ✓ 1104 / ✗ 4914
+
+     checks.........................: 18.34% ✓ 2208      ✗ 9828
+     data_received..................: 347 kB 889 B/s
+     data_sent......................: 412 kB 1.1 kB/s
+     http_req_blocked...............: avg=1.35ms  min=0s       med=0s    max=166.9ms p(90)=1ms    p(95)=4.99ms p(99)=36ms
+     http_req_connecting............: avg=1.34ms  min=0s       med=0s    max=165.9ms p(90)=1ms    p(95)=4.99ms p(99)=36ms
+   ✗ http_req_duration..............: avg=10.31s  min=0s       med=0s    max=1m0s    p(90)=59.99s p(95)=1m0s   p(99)=1m0s
+       { expected_response:true }...: avg=14.97s  min=120.26ms med=6.19s max=59.93s  p(90)=45.68s p(95)=52.87s p(99)=57.69s
+   ✗ http_req_failed................: 81.65% ✓ 4914      ✗ 1104
+     http_req_receiving.............: avg=38.58µs min=0s       med=0s    max=19.98ms p(90)=0s     p(95)=0s     p(99)=999.38µs
+     http_req_sending...............: avg=21.49µs min=0s       med=0s    max=7.99ms  p(90)=0s     p(95)=0s     p(99)=999.2µs
+     http_req_tls_handshaking.......: avg=0s      min=0s       med=0s    max=0s      p(90)=0s     p(95)=0s     p(99)=0s
+     http_req_waiting...............: avg=10.31s  min=0s       med=0s    max=1m0s    p(90)=59.99s p(95)=1m0s   p(99)=1m0s
+     http_reqs......................: 6018   15.429264/s
+     iteration_duration.............: avg=18.6s   min=999.1µs  med=6.71s max=1m41s   p(90)=1m1s   p(95)=1m23s  p(99)=1m40s
+     iterations.....................: 6018   15.429264/s
+     vus............................: 91     min=1       max=998
+     vus_max........................: 1000   min=1000    max=1000</pre>
+    <div style="font-size:9pt;text-align:left;margin:0 0 6pt;">Fonte: Elaborado pelo autor (2026).</div>
+  </div>
+
+  <div style="page-break-inside:avoid;">
+    <div style="font-size:10pt;text-align:center;margin:10pt 0 1pt;">Quadro 4 – Resumo de execução do k6 — Teste de Pico — POST /checkout/simple</div>
+    <pre style="font-family:Consolas,monospace;font-size:6.5pt;line-height:1.12;white-space:pre-wrap;word-break:break-word;border:0.75pt solid #999;background:#f5f5f5;padding:4pt 6pt;margin:2pt 0 1pt;">     execution: local
+        script: tests\spike.js
+        output: -
+
+     scenarios: (100.00%) 1 scenario, 300 max VUs, 2m20s max duration (incl. graceful stop):
+              * default: Up to 300 looping VUs for 1m50s over 4 stages (gracefulRampDown: 30s, gracefulStop: 30s)
+
+Init      [  55% ] 165/300 VUs initialized
+
+     ✓ status é 201
+     ✓ status=APPROVED
+
+     checks.........................: 100.00% ✓ 151034     ✗ 0
+     data_received..................: 22 MB   203 kB/s
+     data_sent......................: 14 MB   125 kB/s
+     http_req_blocked...............: avg=334.68µs min=0s     med=0s       max=636.99ms p(90)=0s       p(95)=0s       p(99)=0s
+     http_req_connecting............: avg=217.69µs min=0s     med=0s       max=466.23ms p(90)=0s       p(95)=0s       p(99)=0s
+   ✓ http_req_duration..............: avg=275.04ms min=99.8ms med=254.95ms max=1.41s    p(90)=403ms    p(95)=483.8ms  p(99)=891.91ms
+       { expected_response:true }...: avg=275.04ms min=99.8ms med=254.95ms max=1.41s    p(90)=403ms    p(95)=483.8ms  p(99)=891.91ms
+   ✓ http_req_failed................: 0.00%   ✓ 0          ✗ 75517
+     http_req_receiving.............: avg=10.75ms  min=0s     med=0s       max=873.1ms  p(90)=998.9µs  p(95)=2.99ms   p(99)=469.5ms
+     http_req_sending...............: avg=371.24µs min=0s     med=0s       max=747.04ms p(90)=0s       p(95)=0s       p(99)=1ms
+     http_req_tls_handshaking.......: avg=0s       min=0s     med=0s       max=0s       p(90)=0s       p(95)=0s       p(99)=0s
+     http_req_waiting...............: avg=263.91ms min=99.8ms med=253.4ms  max=1.15s    p(90)=388.32ms p(95)=440.71ms p(99)=576.17ms
+     http_reqs......................: 75517   685.309714/s
+     iteration_duration.............: avg=281.28ms min=99.8ms med=257.98ms max=1.43s    p(90)=415.64ms p(95)=519.09ms p(99)=939.33ms
+     iterations.....................: 75517   685.309714/s
+     vus............................: 17      min=0        max=300
+     vus_max........................: 300     min=168      max=300</pre>
+    <div style="font-size:9pt;text-align:left;margin:0 0 6pt;">Fonte: Elaborado pelo autor (2026).</div>
+  </div>
+<!--APENDICE-FIM-->
+
 </body>
 </html>
