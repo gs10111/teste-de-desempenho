@@ -1,0 +1,90 @@
+{
+  "smoke": {
+    "durationMs": 30559.4445,
+    "reqs": 30,
+    "rps": 0.981693237257634,
+    "errPct": 0,
+    "errCount": 0,
+    "okCount": 30,
+    "avg": 5.8931666666666676,
+    "med": 1.9914,
+    "p90": 7.897570000000006,
+    "p95": 14.983074999999982,
+    "p99": 63.17521200000006,
+    "max": 81.6851,
+    "checksPct": 100,
+    "checksPass": 60,
+    "checksFail": 0,
+    "vusMax": 1,
+    "thresholds": {
+      "http_req_failed: rate==0": true,
+      "checks: rate==1.0": true
+    }
+  },
+  "load": {
+    "durationMs": 210197.833,
+    "reqs": 37277,
+    "rps": 177.34245623740563,
+    "errPct": 0,
+    "errCount": 0,
+    "okCount": 37277,
+    "avg": 219.21899881696723,
+    "med": 215.1863,
+    "p90": 296.22308,
+    "p95": 308.52836,
+    "p99": 370.416,
+    "max": 4039.7137,
+    "checksPct": 100,
+    "checksPass": 74554,
+    "checksFail": 0,
+    "vusMax": 50,
+    "thresholds": {
+      "http_req_duration: p(95)<500": true,
+      "http_req_failed: rate<0.01": true
+    }
+  },
+  "stress": {
+    "durationMs": 390038.044,
+    "reqs": 6018,
+    "rps": 15.429264125834862,
+    "errPct": 81.65503489531406,
+    "errCount": 4914,
+    "okCount": 1104,
+    "avg": 10315.634767530753,
+    "med": 0,
+    "p90": 59998.49053,
+    "p95": 60020.267875000005,
+    "p99": 60052.789859,
+    "max": 60189.7524,
+    "checksPct": 18.344965104685944,
+    "checksPass": 2208,
+    "checksFail": 9828,
+    "vusMax": 1000,
+    "thresholds": {
+      "http_req_duration: p(95)<2000": false,
+      "http_req_failed: rate<0.05": false
+    }
+  },
+  "spike": {
+    "durationMs": 110193.9728,
+    "reqs": 75517,
+    "rps": 685.3097141443657,
+    "errPct": 0,
+    "errCount": 0,
+    "okCount": 75517,
+    "avg": 275.0415953215844,
+    "med": 254.9577,
+    "p90": 403.00650000000013,
+    "p95": 483.8048799999998,
+    "p99": 891.9144,
+    "max": 1416.2585,
+    "checksPct": 100,
+    "checksPass": 151034,
+    "checksFail": 0,
+    "vusMax": 300,
+    "thresholds": {
+      "http_req_duration: p(95)<1000": true,
+      "http_req_failed: rate<0.05": true
+    }
+  }
+}

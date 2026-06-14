@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Relatório Técnico — Engenharia de Desempenho</title>
+<style>
+  @page { size: A4; margin: 9mm 10mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Segoe UI", Arial, sans-serif; color: #1a1a1a; font-size: 9.4px; line-height: 1.32; margin: 0; }
+  h1 { font-size: 16px; margin: 0 0 1px; color: #0b3d66; }
+  h2 { font-size: 11px; margin: 9px 0 3px; color: #0b3d66; border-bottom: 1.5px solid #0b3d66; padding-bottom: 1px; }
+  .sub { color: #555; font-size: 8.6px; margin-bottom: 2px; }
+  p { margin: 3px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 3px 0; }
+  th, td { border: 1px solid #c4ccd4; padding: 2.5px 4px; text-align: center; }
+  th { background: #0b3d66; color: #fff; font-weight: 600; }
+  td.l, th.l { text-align: left; }
+  tr:nth-child(even) td { background: #f3f6f9; }
+  .ok { color: #1b7d3b; font-weight: 700; }
+  .bad { color: #c0211b; font-weight: 700; }
+  .warn { color: #b06a00; font-weight: 700; }
+  .cards { display: flex; gap: 8px; margin: 4px 0; }
+  .card { flex: 1; border: 1px solid #c4ccd4; border-radius: 5px; padding: 5px 7px; background: #f8fafc; }
+  .card .t { font-size: 8.6px; color: #555; text-transform: uppercase; letter-spacing: .3px; }
+  .card .big { font-size: 13px; font-weight: 700; color: #0b3d66; }
+  .card small { color: #444; font-size: 8.4px; }
+  .mono { font-family: Consolas, "Courier New", monospace; }
+  ul { margin: 3px 0; padding-left: 16px; }
+  li { margin: 1px 0; }
+  .foot { margin-top: 7px; color: #777; font-size: 7.8px; border-top: 1px solid #ddd; padding-top: 3px; }
+  .tag { font-size: 7.6px; padding: 0 4px; border-radius: 6px; }
+</style>
+</head>
+<body>
+
+  <h1>Relatório Técnico — Engenharia de Desempenho (k6)</h1>
+  <div class="sub">
+    SUT: <b>ecommerce-checkout-api</b> (Node.js/Express, porta 3000) &middot; Ferramenta: <b>k6 v2.0.0</b> &middot;
+    Data: <b>14/06/2026</b> &middot; Ambiente: Windows 10, execução local (localhost)
+  </div>
+
+  <h2>1. Resumo Executivo — Capacidade Máxima</h2>
+  <div class="cards">
+    <div class="card">
+      <div class="t">I/O Bound — POST /checkout/simple</div>
+      <div class="big">≥ 300 VUs <small>(ruptura não atingida)</small></div>
+      <small>Endpoint não-bloqueante. Sustentou 50 VUs (p95 309 ms) e absorveu pico de 300 VUs
+      com <b>0% de erro</b>, p95 484 ms e <b>685 req/s</b>. A capacidade respeitando p95 &lt; 500 ms é de
+      pelo menos <b>300 usuários simultâneos</b>.</small>
+    </div>
+    <div class="card">
+      <div class="t">CPU Bound — POST /checkout/crypto</div>
+      <div class="big">&lt; ~74 VUs <small>(falha cedo)</small></div>
+      <small>bcrypt síncrono <b>bloqueia o event loop</b>. Já em ~25 VUs o p95 passa de 3 s; os primeiros
+      erros/timeouts surgem em <b>~74 VUs</b> e o <b>colapso total (~100% falha)</b> ocorre em ~386 VUs.
+      Capacidade útil real: <b>poucas dezenas</b> de usuários.</small>
+    </div>
+  </div>
+  <p><b>Conclusão:</b> o gargalo da aplicação é a <b>CPU</b> (operações de criptografia que bloqueiam a thread única do
+  Node.js). O caminho de I/O escala muito bem; o de CPU não tem praticamente nenhuma folga sob concorrência.</p>
+
+  <h2>2. Evidências — Resumos de Execução k6</h2>
+  <table>
+    <tr>
+      <th class="l">Teste</th><th>Endpoint</th><th>VUs máx</th><th>Reqs</th><th>Throughput</th>
+      <th>p95</th><th>p99</th><th>Latência máx</th><th>Taxa de erro</th><th>SLA / Thresholds</th>
+    </tr>
+    <tr>
+      <td class="l"><b>Smoke</b></td><td>GET /health</td><td>1</td><td>30</td><td>0,98 req/s</td>
+      <td>14,98 ms</td><td>63,18 ms</td><td>81,7 ms</td><td class="ok">0,00%</td><td class="ok">✓ 100% sucesso</td>
+    </tr>
+    <tr>
+      <td class="l"><b>Load</b></td><td>POST /checkout/simple</td><td>50</td><td>37.277</td><td>177,3 req/s</td>
+      <td>308,53 ms</td><td>370,42 ms</td><td>4.039 ms</td><td class="ok">0,00%</td><td class="ok">✓ p95&lt;500 e erro&lt;1%</td>
+    </tr>
+    <tr>
+      <td class="l"><b>Stress</b></td><td>POST /checkout/crypto</td><td>1000</td><td>6.018</td><td>15,4 req/s</td>
+      <td class="bad">60.020 ms</td><td class="bad">60.053 ms</td><td>60.190 ms</td><td class="bad">81,66%</td><td class="bad">✗ violados (ruptura)</td>
+    </tr>
+    <tr>
+      <td class="l"><b>Spike</b></td><td>POST /checkout/simple</td><td>300</td><td>75.517</td><td>685,3 req/s</td>
+      <td>483,80 ms</td><td>891,91 ms</td><td>1.416 ms</td><td class="ok">0,00%</td><td class="ok">✓ absorvido</td>
+    </tr>
+  </table>
+  <p class="sub">Saídas completas do k6 e JSONs por teste em <span class="mono">results/&lt;teste&gt;.txt</span> e
+  <span class="mono">results/&lt;teste&gt;-summary.json</span> (gerados via <span class="mono">handleSummary()</span>).</p>
+
+  <h2>3. Análise de Estresse — Ponto de Ruptura (/checkout/crypto)</h2>
+  <p>Carga crescente 0→200→500→1000 VUs em 6 min, com série temporal exportada
+  (<span class="mono">--out json</span>) e agregada em janelas de 15 s:</p>
+  <div class="cards">
+    <div class="card"><div class="t">Latência estoura SLA (p95≥500 ms)</div><div class="big warn">~25 VUs</div><small>p95 já em 3,28 s na 1ª janela</small></div>
+    <div class="card"><div class="t">Começa a FALHAR (erro ≥ 1%)</div><div class="big bad">~74 VUs</div><small>12,6% de erro · p95 9,5 s</small></div>
+    <div class="card"><div class="t">Degradação severa (erro ≥ 50%)</div><div class="big bad">~311 VUs</div><small>81,8% de erro</small></div>
+    <div class="card"><div class="t">Colapso total (erro ~100%)</div><div class="big bad">~386 VUs</div><small>timeouts de 60 s</small></div>
+  </div>
+  <table>
+    <tr><th class="l">Janela (s)</th><th>VUs</th><th>Reqs</th><th>Erro %</th><th>p95 (ms)</th><th>p99 (ms)</th><th>Status</th></tr>
+    <tr><td class="l">0–15</td><td>25</td><td>97</td><td class="ok">0,0</td><td>3.282</td><td>4.599</td><td class="warn">latência alta</td></tr>
+    <tr><td class="l">15–30</td><td>50</td><td>108</td><td class="ok">0,0</td><td>6.155</td><td>7.408</td><td class="warn">latência alta</td></tr>
+    <tr><td class="l">30–45</td><td>74</td><td>111</td><td class="bad">12,6</td><td>9.526</td><td>10.971</td><td class="bad">início das falhas</td></tr>
+    <tr><td class="l">45–60</td><td>99</td><td>133</td><td class="bad">35,3</td><td>16.027</td><td>16.653</td><td class="bad">degradando</td></tr>
+    <tr><td class="l">135–150</td><td>273</td><td>102</td><td class="bad">49,0</td><td>46.108</td><td>47.389</td><td class="bad">degradação severa</td></tr>
+    <tr><td class="l">150–165</td><td>311</td><td>264</td><td class="bad">81,8</td><td>51.874</td><td>53.784</td><td class="bad">crítico</td></tr>
+    <tr><td class="l">180–195</td><td>386</td><td>1.049</td><td class="bad">100,0</td><td>60.007</td><td>60.034</td><td class="bad">colapso total</td></tr>
+    <tr><td class="l">345–360</td><td>998</td><td>217</td><td class="bad">100,0</td><td>60.052</td><td>60.085</td><td class="bad">colapso total</td></tr>
+  </table>
+  <p><b>Diagnóstico:</b> sob carga de CPU, o throughput satura em ~15 req/s (limite da thread única processando bcrypt).
+  A partir de ~74 VUs a fila de requisições cresce sem limite, gerando primeiro <b>timeouts de 60 s</b> e, em seguida,
+  <b>recusas de conexão</b> (mediana de latência cai a 0 ms = conexões rejeitadas) — caracterizando o ponto de ruptura.</p>
+
+  <div class="foot">
+    Tabela completa de janelas em <span class="mono">results/stress-breakpoint.txt</span> ·
+    Série temporal bruta em <span class="mono">results/stress-raw.json</span> ·
+    Scripts em <span class="mono">tests/</span> (smoke, load, stress, spike) · Relatório gerado a partir de métricas reais coletadas pelo k6.
+  </div>
+
+</body>
+</html>

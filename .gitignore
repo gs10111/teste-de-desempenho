@@ -84,16 +84,12 @@ dist
 
 # Gatsby files
 .cache/
-# Comment in the public line in if your project uses Gatsby and not Next.js
-# https://nextjs.org/blog/next-9-1#public-directory-support
-# public
 
 # vuepress build output
 .vuepress/dist
 
 # vuepress v2.x temp and cache directory
 .temp
-.cache
 
 # Sveltekit cache directory
 .svelte-kit/
@@ -137,3 +133,23 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# === Suíte de testes de performance (k6) ===
+
+# Claude Code
+.claude/
+
+# Clone local da SUT usado para rodar a API (a SUT também está versionada em atividade/)
+teste-de-desempenho/
+
+# Binário do k6 e artefatos grandes (não versionar)
+tools/k6-v*-windows-amd64/
+tools/k6.zip
+
+# Série temporal bruta do k6 (~23 MB); o resumo fica em results/stress-breakpoint.txt
+results/stress-raw.json
+
+# Sistema operacional / temporários
+Thumbs.db
+Desktop.ini
+*.tmp
